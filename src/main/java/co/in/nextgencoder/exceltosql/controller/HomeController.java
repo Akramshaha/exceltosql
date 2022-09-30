@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.gson.GsonBuilderCustomizer;
 import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,8 +37,8 @@ public class HomeController {
     }
 
     @PostMapping("/convert")
-    public String convertTo(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
-                            HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void convertTo(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
+                            HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 
         XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
         XSSFSheet sheet = workbook.getSheetAt(0);
@@ -75,15 +76,13 @@ public class HomeController {
                 str2+=");";
             }
         }
-        System.out.println(str);
-        System.out.println(str2);
 
         //To save whole excel with header as column name in DataBase
         /*
         manualNativeQuery.nativeCreateTableQuery(str);
         manualNativeQuery.nativeCreateInsertIntoQuery(str2);
         */
-        String filePath = "/home/akram/var/data/exceltosql/exceltosql.sql";
+        String filePath = "/home/akram/var/data/exceltosql/"+tableName+".sql";
         File newFile = new File(filePath);
         if(newFile.createNewFile()){
             System.out.println("File Created");
@@ -96,11 +95,20 @@ public class HomeController {
         fileWriter.write("\n");
         fileWriter.write(str2);
         fileWriter.close();
-
+        //redirectAttributes.addFlashAttribute("fileStatus","SUCCESS");
+        //model.addAttribute("fileStatus","SUCCESS");
+        //response.setStatus(200);
         response.setContentType("application/sql");
         response.setHeader("Content-Disposition", String.format("inline; filename=\"" + newFile.getName() + "\""));
         response.setContentLength((int) newFile.length());
-        response.getOutputStream();
-        return "index";
+        InputStream inputStream = new BufferedInputStream(new FileInputStream(newFile));
+        if(newFile.delete()){
+            System.out.println("File Deleted");
+        }
+        try {
+            FileCopyUtils.copy(inputStream, response.getOutputStream());
+        }catch (Exception e){
+            //e.printStackTrace();
+        }
     }
 }

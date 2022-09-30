@@ -1,22 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Excel To SQL</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel to SQL</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body class="container-fluid">
-<div class="container">
-
-
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark">
+    <span class="navbar-brand mb-0 h1">Excel To SQL</span>
+</nav>
+<div class="container-fluid mt-3">
+    <div class="row justify-content-center m-4" th:if="${fileStatus} == 'SUCCESS'">
+        <div class="col-8  bg-success border-0" style="border-radius: 10px;">
+            <span class="text-light">File successfully converted and downlaoded</span>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header">
+                    Excel to SQL converter
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Use to convert excel file to sql table.</p>
+                    <form action="/convert" method="post" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="inputGroupFile04" name="file" aria-describedby="inputGroupFileAddon04">
+                                <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+                            </div>
+                            <div class="input-group-append">
+                                <input class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon04" value="Download/Convert">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<h1>HELLO</h1>
-
-<form method="post" action="/convert" enctype="multipart/form-data">
-  <input type="file" name="file">
-  <input type="submit" placeholder="SUBMIT">
-</form>
+<script>
+        $('#inputGroupFile04').on('change',function(){
+            //get the file name
+            var fileName = $(this).val();
+            //replace the "Choose a file" label
+            $(this).next('.custom-file-label').html(fileName);
+        })
+    </script>
 </body>
 </html>
